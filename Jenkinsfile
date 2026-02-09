@@ -3,6 +3,8 @@ pipeline {
 
     environment {
         IMAGE_NAME = "dilshadashraf007/python-app"
+        KUBE_CONFIG_CREDENTIALS = "k8s"
+        NODE_PORT = "30007" // Set the NodePort your service uses
     }
 
     stages {
@@ -10,14 +12,14 @@ pipeline {
         stage('Clone Repo') {
             steps {
                 git branch: 'main',
-                    url: 'https://github.com/dilshadashraf007/myapp.git'
+                    url: 'https://github.com/dilshadashraf007/c.git/'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t $IMAGE_NAME:$BUILD_NUMBER ."
-                sh "docker tag $IMAGE_NAME:$BUILD_NUMBER $IMAGE_NAME:latest"
+                bat "docker build -t %IMAGE_NAME%:%BUILD_NUMBER% ."
+                bat "docker tag %IMAGE_NAME%:%BUILD_NUMBER% %IMAGE_NAME%:latest"
             }
         }
 
@@ -28,8 +30,8 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    sh '''
-                        echo $DOCKER_PASS | docker login -u $DOCKER_USER --password-stdin
+                    bat '''
+                        echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
                     '''
                 }
             }
@@ -37,34 +39,39 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                sh "docker push $IMAGE_NAME:$BUILD_NUMBER"
-                sh "docker push $IMAGE_NAME:latest"
+                bat "docker push %IMAGE_NAME%:%BUILD_NUMBER%"
+                bat "docker push %IMAGE_NAME%:latest"
             }
         }
 
-        stage('Deploy to Local Kubernetes') {
+        stage('Deploy to Kubernetes') {
             steps {
-                sh '''
-                    kubectl apply -f k8s/deployment.yaml
-                    kubectl apply -f k8s/service.yaml
-                    kubectl rollout status deployment/python-app-deployment
-                '''
+                withCredentials([file(credentialsId: 'k8s', variable: 'KUBECONFIG')]) {
+                    bat '''
+                        kubectl config use-context docker-desktop
+
+                        kubectl apply -f k8s\\deployment.yaml
+                        kubectl apply -f k8s\\service.yaml
+                        kubectl rollout status deployment/python-app-deployment
+                    '''
+                }
             }
         }
 
         stage('Show Application URL') {
             steps {
-                sh 'kubectl get svc python-app-service'
+                echo "🌐 Your application is now deployed!"
+                echo "Open in browser: http://localhost:%NODE_PORT%"
             }
         }
     }
 
     post {
         success {
-            echo "Pipeline completed successfully"
+            echo "✅ Pipeline completed successfully"
         }
         failure {
-            echo "Pipeline failed"
+            echo "❌ Pipeline failed"
         }
     }
 }
