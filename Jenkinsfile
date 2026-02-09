@@ -27,13 +27,36 @@ pipeline {
             }
         }
 
-        stage('Build & Push Image') {
+        stage('Build & Push (cached)') {
             steps {
                 bat """
-                docker build -t %IMAGE_NAME%:%BUILD_NUMBER% .
+                docker pull %IMAGE_NAME%:latest || echo no-cache
+                docker build --cache-from %IMAGE_NAME%:latest -t %IMAGE_NAME%:%BUILD_NUMBER% .
                 docker tag %IMAGE_NAME%:%BUILD_NUMBER% %IMAGE_NAME%:latest
                 docker push %IMAGE_NAME%:%BUILD_NUMBER%
                 docker push %IMAGE_NAME%:latest
+                """
+            }
+        }
+
+        stage('Fast Deploy') {
+            steps {
+                bat """
+                kubectl set image deployment/python-app-deployment \
+                python-app=%IMAGE_NAME%:%BUILD_NUMBER%
+
+                kubectl rollout status deployment/python-app-deployment
+                """
+            }
+        }
+
+        stage('Show URL') {
+            steps {
+                echo "App: http://localhost:${NODE_PORT}"
+            }
+        }
+    }
+}
                 """
             }
         }
