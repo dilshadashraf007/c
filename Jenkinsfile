@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         IMAGE_NAME = "dilshadashraf007/python-app"
-        KUBE_CONFIG_CREDENTIALS = "k8s"
-        NODE_PORT = "30007" // Set the NodePort your service uses
+        NODE_PORT = "30007"
     }
 
     stages {
@@ -16,13 +15,6 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
-            steps {
-                bat "docker build -t %IMAGE_NAME%:%BUILD_NUMBER% ."
-                bat "docker tag %IMAGE_NAME%:%BUILD_NUMBER% %IMAGE_NAME%:latest"
-            }
-        }
-
         stage('Docker Login') {
             steps {
                 withCredentials([usernamePassword(
@@ -30,48 +22,45 @@ pipeline {
                     usernameVariable: 'DOCKER_USER',
                     passwordVariable: 'DOCKER_PASS'
                 )]) {
-                    bat '''
-                        echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin
-                    '''
+                    bat "echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin"
                 }
             }
         }
 
-        stage('Push Docker Image') {
+        stage('Build & Push Image') {
             steps {
-                bat "docker push %IMAGE_NAME%:%BUILD_NUMBER%"
-                bat "docker push %IMAGE_NAME%:latest"
+                bat """
+                docker build -t %IMAGE_NAME%:%BUILD_NUMBER% .
+                docker tag %IMAGE_NAME%:%BUILD_NUMBER% %IMAGE_NAME%:latest
+                docker push %IMAGE_NAME%:%BUILD_NUMBER%
+                docker push %IMAGE_NAME%:latest
+                """
             }
         }
 
         stage('Deploy to Kubernetes') {
             steps {
-                withCredentials([file(credentialsId: 'k8s', variable: 'KUBECONFIG')]) {
-                    bat '''
-                        kubectl config use-context docker-desktop
-
-                        kubectl apply -f k8s\\deployment.yaml
-                        kubectl apply -f k8s\\service.yaml
-                        kubectl rollout status deployment/python-app-deployment
-                    '''
-                }
+                bat """
+                kubectl apply -f k8s\\deployment.yaml
+                kubectl apply -f k8s\\service.yaml
+                kubectl rollout status deployment/python-app-deployment
+                """
             }
         }
 
         stage('Show Application URL') {
             steps {
-                echo "🌐 Your application is now deployed!"
-                echo "Open in browser: http://localhost:%NODE_PORT%"
+                echo "Application deployed at: http://localhost:${NODE_PORT}"
             }
         }
     }
 
     post {
         success {
-            echo "✅ Pipeline completed successfully"
+            echo "Pipeline completed successfully"
         }
         failure {
-            echo "❌ Pipeline failed"
+            echo "Pipeline failed"
         }
     }
 }
