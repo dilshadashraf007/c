@@ -3,9 +3,6 @@ pipeline {
 
     environment {
         IMAGE_NAME = "dilshadashraf007/python-app"
-        AWS_REGION = "ap-south-1"              // Change if needed
-        EKS_CLUSTER = "your-eks-cluster-name" // Change to your cluster
-        NODE_PORT = "30007"
     }
 
     stages {
@@ -45,17 +42,7 @@ pipeline {
             }
         }
 
-        stage('Update Kubeconfig for EKS') {
-            steps {
-                sh """
-                aws eks update-kubeconfig \
-                  --region $AWS_REGION \
-                  --name $EKS_CLUSTER
-                """
-            }
-        }
-
-        stage('Deploy to EKS') {
+        stage('Deploy to Local Kubernetes') {
             steps {
                 sh '''
                     kubectl apply -f k8s/deployment.yaml
@@ -67,8 +54,7 @@ pipeline {
 
         stage('Show Application URL') {
             steps {
-                echo "Application deployed to EKS."
-                echo "Use kubectl get svc to find the external IP or NodePort."
+                sh 'kubectl get svc python-app-service'
             }
         }
     }
