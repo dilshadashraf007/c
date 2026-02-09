@@ -12,5 +12,7 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["node", "backend/server.js"]
+CMD ["node", "backend/nodemon index.js"]
+CMD ["node", "frontend/npm run dev"]
+
 
