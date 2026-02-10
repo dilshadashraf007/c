@@ -2,8 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: python-app-deployment
-  labels:
-    app: python-app
 spec:
   replicas: 2
   selector:
@@ -15,14 +13,7 @@ spec:
         app: python-app
     spec:
       containers:
-      - name: python-container
+      - name: python-app
         image: 070949691278.dkr.ecr.ap-northeast-1.amazonaws.com/python-app:latest
         ports:
-        - containerPort: 5000  # Change this to the port your app listens on
-        resources:
-          requests:
-            cpu: "100m"
-            memory: "128Mi"
-          limits:
-            cpu: "250m"
-            memory: "256Mi"
+        - containerPort: 80
