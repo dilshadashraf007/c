@@ -1,12 +1,24 @@
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: cicd-admin
-subjects:
-- kind: ServiceAccount
-  name: cicd-sa
+  name: python-app-deployment
   namespace: default
-roleRef:
-  kind: ClusterRole
-  name: cluster-admin
-  apiGroup: rbac.authorization.k8s.io
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: python-app
+  template:
+    metadata:
+      labels:
+        app: python-app
+    spec:
+      serviceAccountName: cicd-sa
+      containers:
+      - name: python-app
+        image: 070949691278.dkr.ecr.ap-northeast-1.amazonaws.com/python-app:latest
+        ports:
+        - containerPort: 5000
+        env:
+        - name: ENVIRONMENT
+          value: "production"
