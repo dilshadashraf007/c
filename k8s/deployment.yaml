@@ -1,8 +1,9 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: python-app-deployment
-  namespace: default
+  name: python-app
+  labels:
+    app: python-app
 spec:
   replicas: 2
   selector:
@@ -13,12 +14,9 @@ spec:
       labels:
         app: python-app
     spec:
-      serviceAccountName: cicd-sa
       containers:
       - name: python-app
-        image: 070949691278.dkr.ecr.ap-northeast-1.amazonaws.com/python-app:latest
+        image: dilshadashraf007/python-app
         ports:
         - containerPort: 5000
-        env:
-        - name: ENVIRONMENT
-          value: "production"
+
