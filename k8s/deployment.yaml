@@ -1,9 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: python-app
-  labels:
-    app: python-app
+  name: python-app-deployment
 spec:
   replicas: 2
   selector:
@@ -16,7 +14,6 @@ spec:
     spec:
       containers:
       - name: python-app
-        image: dilshadashraf007/python-app
+        image: dilshadashraf007/python-app:latest
         ports:
         - containerPort: 5000
-
