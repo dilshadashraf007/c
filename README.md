@@ -1,40 +1,51 @@
 Node.js CI/CD Deployment on AWS EKS
-This project demonstrates a complete CI/CD pipeline for deploying a Node.js application on AWS EKS using Jenkins, Docker, Amazon ECR, and GitHub.
-The pipeline automates the entire process from code push to production deployment.
+Project Overview
+This project demonstrates a fully automated CI/CD pipeline for deploying a Node.js application on AWS Elastic Kubernetes Service (EKS). The solution integrates GitHub, Jenkins, Docker, and Amazon ECR to automate the entire workflow—from code commit to production deployment.
+The pipeline ensures consistent builds, faster deployments, and scalable application delivery using containerized infrastructure.
 Architecture Overview
-Flow:
+Deployment Flow:
 Developer → GitHub → Jenkins (EC2) → Docker Build → Amazon ECR → AWS EKS → Load Balancer → Internet Users
-Tech Stack
-Backend: Node.js
-Source Control: Git, GitHub
-CI/CD Tool: Jenkins (running on AWS EC2)
-Containerization: Docker
-Container Registry: Amazon ECR
-Orchestration: AWS EKS (Kubernetes)
-Cloud Platform: AWS
-Load Balancer: AWS ELB
+Technology Stack
+Category
+Tools & Services
+Backend
+Node.js
+Source Control
+Git, GitHub
+CI/CD Tool
+Jenkins (on AWS EC2)
+Containerization
+Docker
+Container Registry
+Amazon ECR
+Orchestration
+AWS EKS (Kubernetes)
+Cloud Platform
+AWS
+Load Balancer
+AWS Elastic Load Balancer (ELB)
 CI/CD Pipeline Workflow
-Developer pushes code to GitHub.
-GitHub webhook triggers Jenkins pipeline.
-Jenkins performs:
-Code checkout
-Install dependencies
-Build Docker image
-Docker image is pushed to Amazon ECR using credentials.
-Jenkins deploys the new image to AWS EKS.
-Kubernetes updates the Node.js pods.
-Application is exposed through a Load Balancer.
+Developer pushes code to the GitHub repository.
+A GitHub webhook automatically triggers the Jenkins pipeline.
+Jenkins performs the following stages:
+Checks out the latest code
+Installs application dependencies
+Builds the Docker image
+The Docker image is securely pushed to Amazon ECR.
+Jenkins deploys the updated image to the AWS EKS cluster.
+Kubernetes performs a rolling update of the Node.js pods.
+The application is exposed through an AWS Load Balancer.
 End users access the application via the internet.
 Pipeline Stages
-Continuous Integration
-Code checkout from GitHub
-Build Node.js application
-Build Docker image
-Push image to Amazon ECR
-Continuous Delivery
-Deploy updated image to EKS
-Kubernetes rolling update of pods
-Application served through Load Balancer
+Continuous Integration (CI)
+Source code checkout from GitHub
+Application build
+Docker image creation
+Image push to Amazon ECR
+Continuous Delivery (CD)
+Deployment of updated image to AWS EKS
+Kubernetes rolling updates
+Application served via Load Balancer
 Project Structure
 Copy code
 
@@ -50,31 +61,35 @@ project-root/
 └── README.md
 Prerequisites
 AWS account
-EKS cluster created
-ECR repository created
-Jenkins installed on EC2
-Docker installed
-kubectl configured
-GitHub repository
-Run Application Locally
+Configured EKS cluster
+Created ECR repository
+Jenkins installed on an EC2 instance
+Docker installed on Jenkins server
+kubectl configured with EKS
+GitHub repository with application code
+Local Development
+Install dependencies
 Bash
 Copy code
 npm install
+Start the application
+Bash
+Copy code
 npm start
 Build and Run Docker Image
 Bash
 Copy code
 docker build -t node-app .
 docker run -p 3000:3000 node-app
-Deploy to EKS
+Deploy to AWS EKS
 Bash
 Copy code
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
 Key Features
-Fully automated CI/CD pipeline
-Dockerized Node.js application
+End-to-end automated CI/CD pipeline
+Containerized Node.js application
 Secure image storage in Amazon ECR
 Scalable deployment using AWS EKS
 Load-balanced public access
-Rolling updates with zero downtime
+Zero-downtime rolling updates
