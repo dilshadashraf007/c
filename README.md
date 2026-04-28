@@ -103,7 +103,7 @@ project-root/
 ```bash
 npm install
 
-**Start application
+Start application
 npm start
 🐳 Build & Run Docker Image
 docker build -t node-app .
@@ -111,17 +111,24 @@ docker run -p 3000:3000 node-app
 ☸️ Deploy to AWS EKS
 kubectl apply -f k8s/deployment.yaml
 kubectl apply -f k8s/service.yaml
-✨ Key Features
-End-to-end automated CI/CD pipeline
-Containerized Node.js application
-Secure image storage using Amazon ECR
-Scalable deployment using AWS EKS
-Load-balanced public access
-Zero-downtime deployments with rolling updates
+
+Start application
+npm start
+🐳 Build & Run Docker Image
+docker build -t node-app .
+docker run -p 3000:3000 node-app
+☸️ Deploy to AWS EKS
+kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/service.yaml
+
+
+
 🔗 Connect With Me
 LinkedIn: https://www.linkedin.com/in/dilshadashraf7/
 📌 Author
 
 Dilshad Ashraf
-DevOps & Cloud Enthusiast 🚀**
+DevOps & Cloud Enthusiast 🚀
+
+
 
